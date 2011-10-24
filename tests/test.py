@@ -15,6 +15,11 @@ class TestConfig:
     TRUNCATE_TABLES = True #if set to true, the database tables will be truncated on each test run
     EMAIL_ADDRESS = 'janosch.woschitz@gmail.com'
     SEND_TEST_MAIL = False #runs a test which sends a mail to the configured email address
+    SEND_TTLS_MAIL = False #runs a test which sends a mail via ttls to the configured email address
+    TTLS_PORT = 587
+    TTLS_HOST = 'smtp.gmail.com'
+    TTLS_USER = 'some.mail@googlemail.com'
+    TTLS_PASSWORD = 'some_password'
 
 class Files:
     CLEAN_CONFIG = 'config.cfg'
@@ -101,6 +106,13 @@ class MailTest(unittest.TestCase):
             dispatcher.send_mail(from_addr, TestConfig.EMAIL_ADDRESS, u"\xdcnic\xF6d\xC9 test",u"some chars: \xD0\xCE\xC9\xC6")
             template_dispatcher.send_mail(from_addr, TestConfig.EMAIL_ADDRESS, config.mail_subject, {"{ACTIVATION_TOKEN}": "1234567890"})
             template_dispatcher_with_html.send_mail(from_addr, TestConfig.EMAIL_ADDRESS, config.mail_subject, {"{ACTIVATION_TOKEN}": "1234567890"})
+        if TestConfig.SEND_TTLS_MAIL:
+            dispatcher.config.smtp_host = TestConfig.TTLS_HOST
+            dispatcher.config.smtp_port = TestConfig.TTLS_PORT
+            dispatcher.config.smtp_user = TestConfig.TTLS_USER
+            dispatcher.config.smtp_password = TestConfig.TTLS_PASSWORD
+            dispatcher.config.smtp_use_ttls = True
+            dispatcher.send_mail(from_addr, TestConfig.EMAIL_ADDRESS, "This is a test","This is a test message")
 
 class ValidatorTest(unittest.TestCase):
     def test_validate_email(self):

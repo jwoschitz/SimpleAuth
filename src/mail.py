@@ -10,6 +10,9 @@ class MailConfig(object):
         self.smtp_port = config.smtp_port
         self.smtp_local_hostname = config.smtp_local_hostname
         self.smtp_timeout = config.smtp_timeout
+        self.smtp_use_ttls = config.smtp_use_ttls
+        self.smtp_user = config.smtp_user
+        self.smtp_password = config.smtp_password
 
 class MailDispatcher(object):
     def __init__(self, mail_config):
@@ -27,6 +30,12 @@ class MailDispatcher(object):
             msg = self._get_multipart_message(from_addr, receiver_addr, subject, body, body_html)
         else:
             msg = self._get_plaintext_message(from_addr, receiver_addr, subject, body)
+        
+        if(self.config.smtp_use_ttls):
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(self.config.smtp_user,self.config.smtp_password)
         
         server.set_debuglevel(1)
         server.sendmail(from_addr, receiver_addr, msg.as_string())
