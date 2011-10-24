@@ -2,6 +2,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.Header import Header
+from email import Charset
 
 class MailConfig(object):
     def __init__(self, config):
@@ -32,8 +33,9 @@ class MailDispatcher(object):
         server.quit()
         
     def _append_header(self, msg, from_addr, receiver_addr, subject, is_multipart = False):
-        header_charset = 'ISO-8859-1'
-        msg['Subject'] = Header(unicode(subject), header_charset)
+        #header_charset = 'ISO-8859-1'
+        #msg['Subject'] = Header(unicode(subject), header_charset)
+        msg['Subject'] = Header(subject.encode('utf-8'), 'UTF-8').encode()
         msg['From'] = from_addr
         msg['To'] = receiver_addr
         if is_multipart:
@@ -41,37 +43,24 @@ class MailDispatcher(object):
         return msg
     
     def _get_plaintext_message(self, from_addr, receiver_addr, subject, body):
-        body_charset = self._get_charset(body)
-        msg = MIMEText(body.encode(body_charset), 'plain', body_charset)
+        msg = self._get_body_as_mimetext(body,'plain')
         msg = self._append_header(msg, from_addr, receiver_addr, subject)
         return msg
         
     def _get_body_as_mimetext(self, body, mime_type):
-        charset = self._get_charset(body)
-        mime_text = MIMEText(body.encode(charset), mime_type, charset)
+        Charset.add_charset('utf-8', Charset.QP, Charset.QP, 'utf-8')
+        mime_text = MIMEText(body.encode('utf-8'), mime_type, 'UTF-8')
         return mime_text
     
     def _get_multipart_message(self, from_addr, receiver_addr, subject, body, body_html):
-        msg_root = MIMEMultipart('related')
-        msg_root = self._append_header(msg_root, from_addr, receiver_addr, subject, True)  
         # Encapsulate the plain and HTML versions of the message body in an
         # 'alternative' part, so message agents can decide which they want to display.        
-        msg_alternative = MIMEMultipart('alternative')
-        msg_root.attach(msg_alternative)
-        msg_alternative.attach(self._get_body_as_mimetext(body,'plain'))
-        msg_alternative.attach(self._get_body_as_mimetext(body_html,'html'))
-        return msg_root
-    
-    def _get_charset(self, text):
-        for charset in 'US-ASCII', 'ISO-8859-1', 'UTF-8':
-            try:
-                text.encode(charset)
-            except UnicodeError:
-                pass
-            else:
-                break
-        return charset
-
+        msg = MIMEMultipart('alternative')
+        msg = self._append_header(msg, from_addr, receiver_addr, subject, True)  
+        msg.attach(self._get_body_as_mimetext(body,'plain'))
+        msg.attach(self._get_body_as_mimetext(body_html,'html'))
+        return msg
+        
 class TemplateMailDispatcher(MailDispatcher):
     def __init__(self, mail_config, template, html_template = None):
         super(self.__class__, self).__init__(mail_config)

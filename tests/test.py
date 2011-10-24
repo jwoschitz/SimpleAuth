@@ -95,7 +95,7 @@ class MailTest(unittest.TestCase):
         mail_config = auth.MailConfig(config)
         dispatcher = auth.MailDispatcher(mail_config)
         template_dispatcher = auth.TemplateMailDispatcher(mail_config, config.mail_body)        
-        template_dispatcher_with_html = auth.TemplateMailDispatcher(mail_config, config.mail_body, "<b>Some HTML<b><br/>Token: {ACTIVATION_TOKEN}</br><span style=\"color:red\"><b>red text</b></span>")
+        template_dispatcher_with_html = auth.TemplateMailDispatcher(mail_config, config.mail_body, u"<b>Some HTML and \xdcnic\xF6d\xC9 <b><br/>Token: {ACTIVATION_TOKEN}</br><span style=\"color:red\"><b>red text</b></span>")
         if TestConfig.SEND_TEST_MAIL:            
             dispatcher.send_mail(from_addr, TestConfig.EMAIL_ADDRESS, "This is a test","This is a test message")
             dispatcher.send_mail(from_addr, TestConfig.EMAIL_ADDRESS, u"\xdcnic\xF6d\xC9 test",u"some chars: \xD0\xCE\xC9\xC6")
