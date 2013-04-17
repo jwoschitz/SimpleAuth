@@ -1,24 +1,27 @@
-Simple login module for Python 2.7.2
-----------------------------------------------------
-This module provides a lightweight authorization and login module
+# Simple Auth
 
-Dependencies
-----------------------------------------------------
-This module needs MySQLdb
+This module provides a lightweight authorization and login module with almost no dependencies
 
-Structure
-----------------------------------------------------
-console_demo
-    contains a small demo application which uses the auth module
-src
-    the source code
-tests
-    contains the unittests
+## Dependencies
+* This module has been written for Python 2.7, has not been tested yet with other versions.
+* Currently this module needs MySQLdb, will change this in the future to support also SQLite and other database providers.
 
-Usage
-----------------------------------------------------
-# create the database schema first (see schema.sql)
+## Structure
+* console_demo
+    * contains a small console application which shows an example usage of the auth module
+* src
+    * the source code
+* tests
+    * contains the unittests
 
+## Setup
+1. Create the database schema manually (see [schema.sql](schema.sql)), this will change in future versions
+2. Adapt config file to fit your needs, you may use [this example](console_demo/config.cfg) as a starting point
+3. Import the module with `import auth`
+
+## Example usage
+
+```python
 import auth
 
 config_file = 'file/path/to/config.cfg'
@@ -42,4 +45,4 @@ else:
         auth.LoginResult.USER_IS_LOCKED_OUT : "Account has been locked."              
     }
     print result.get(user.login_result)
-
+```
