@@ -1,6 +1,6 @@
-Basic login module for Python 2.7.2
+Simple login module for Python 2.7.2
 ----------------------------------------------------
-The module provides some basic authorization and login functionality
+This module provides a lightweight authorization and login module
 
 Dependencies
 ----------------------------------------------------
